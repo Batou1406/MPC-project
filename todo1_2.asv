@@ -12,34 +12,34 @@ p = [0,0,0];
 x0 = [w, phi, v, p]';
 
 %Control input
-% %ascend vertically
-% d1 = 0;
-% d2 = 0;
-% Pavg = 60;
-% Pdiff = 0;
-% 
-% %descend vertically
-% d1 = 0;
-% d2 = 0;
-% Pavg = 55;
-% % Pdiff = 0;
-% 
-% %turn arround x
-% d1 = 0;
-% d2 = 0;
-% Pavg = 55;
-% Pdiff = 0;
-% 
-% %turn arround y
-% d1 = 0;
-% d2 = 0;
-% Pavg = 55;
-% Pdiff = 0;
-
-%turn arround z
+%ascend vertically
 d1 = 0;
 d2 = 0;
-Pavg = 57;
+Pavg = 60;
+Pdiff = 0;
+
+%descend vertically
+d1 = 0;
+d2 = 0;
+Pavg = 55;
+Pdiff = 0;
+
+%turn arround x
+d1 = 0;
+d2 = 0;
+Pavg = 55;
+Pdiff = 0;
+
+%turn arround x
+d1 = 0;
+d2 = 0;
+Pavg = 55;
+Pdiff = 0;
+
+%turn arround x
+d1 = 0;
+d2 = 0;
+Pavg = 55;
 Pdiff = 0;
 
 u = [deg2rad([d1 d2]), Pavg, Pdiff ]'; 
