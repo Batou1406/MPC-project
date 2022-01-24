@@ -32,9 +32,51 @@ classdef MPC_Control_x < MPC_Control
             %       the DISCRETE-TIME MODEL of your system
             
             % SET THE PROBLEM CONSTRAINTS con AND THE OBJECTIVE obj HERE
+            %objectives weight
+            Q = eye(nx);
+            R = eye(nu);
+            
+            %state constraints
+            F =[0,1,0,0;0,1,0,0];
+            f = [-5;5];
+            
+            %input constraints
+            M = [1;1];
+            m = [-15;15];
+            
+            
+            % Compute LQR controller for unconstrained system
+            [K,Qf,~] = dlqr(mpc.A,mpc.B,Q,R);
+            % MATLAB defines K as -K, so invert its signal
+            K = -K;
+            
+            % Compute maximal invariant set
+            Xf = polytope([F;M*K],[f;m]);
+            Acl = [mpc.A+mpc.B*K];
+            while 1
+                prevXf = Xf;
+                [T,t] = double(Xf);
+                preXf = polytope(T*Acl,t);
+                Xf = intersect(Xf, preXf);
+                if isequal(prevXf, Xf)
+                    break
+                end
+            end
+            [Ff,ff] = double(Xf);
+            
             obj = 0;
             con = [];
             
+            for i = 1:N-1
+                con = [con, X(:,i+1) == mpc.A*X(:,i) + mpc.B*U(:,i)]; % System dynamics
+                con = [con, F*X(:,i) <= f]; % State constraints
+                con = [con, M*U(:,i) <= m]; % Input constraints
+                obj = obj + X(:,i)'*Q*X(:,i) + U(:,i)'*R*U(:,i); % Cost function
+            end
+            
+            con = [con, Ff*X(:,N) <= ff]; % Terminal constraint
+            obj = obj + X(:,N)'*Qf*X(:,N); % Terminal weight
+       
             % YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             

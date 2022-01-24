@@ -19,7 +19,7 @@ sys_d_roll = c2d(sys_roll, Ts);
 
 
 % % Design MPC controller
-% H = ?; % Horizon length in seconds
-% mpc_x = MPC_Control_x(sys_x, Ts, H);
+H = 10; % Horizon length in seconds
+mpc_x = MPC_Control_x(sys_x, Ts, H);
 % % Get control input
 % ux = mpc_x.get_u(x)
