@@ -26,21 +26,39 @@ x0 = [w, phi, v, p]';
 % 
 % %turn arround x
 % d1 = 0;
-% d2 = 0;
+% d2 = 0.1;
 % Pavg = 55;
 % Pdiff = 0;
 % 
 % %turn arround y
-% d1 = 0;
+% d1 = 0.1;
 % d2 = 0;
 % Pavg = 55;
 % Pdiff = 0;
+% 
+% %turn arround z
+% d1 = 0;
+% d2 = 0;
+% Pavg = 56;
+% Pdiff = 10;
+% 
+% %move along x
+% d1 = 0.2;
+% d2 = 0;
+% Pavg = 57;
+% Pdiff = 0;
+% 
+% %move along y
+% d1 = 0;
+% d2 = 0.2;
+% Pavg = 57;
+% Pdiff = 0;
 
-%turn arround z
-d1 = 0;
-d2 = 0;
-Pavg = 57;
-Pdiff = 0;
+%hower in space
+d1 = 0.05;
+d2 = 0.1;
+Pavg = 73;
+Pdiff =10;
 
 u = [deg2rad([d1 d2]), Pavg, Pdiff ]'; 
 
