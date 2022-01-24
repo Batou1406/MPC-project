@@ -12,10 +12,7 @@ sys = rocket.linearize(xs, us);
 [sys_x, sys_y, sys_z, sys_roll] = rocket.decompose(sys, xs, us);
 
 %discretize the model
-sys_d_x = c2d(sys_x, Ts);
-sys_d_y = c2d(sys_y, Ts);
-sys_d_z = c2d(sys_z, Ts);
-sys_d_roll = c2d(sys_roll, Ts);
+sys_d_ = c2d(sys, Ts);
 
 
 % % Design MPC controller
