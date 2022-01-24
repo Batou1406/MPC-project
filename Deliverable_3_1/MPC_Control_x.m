@@ -34,15 +34,15 @@ classdef MPC_Control_x < MPC_Control
             % SET THE PROBLEM CONSTRAINTS con AND THE OBJECTIVE obj HERE
             %objectives weight
             Q = eye(nx);
-            R = eye(nu);
+            R = 100*eye(nu);
             
             %state constraints
-            F =[0,1,0,0;0,1,0,0];
-            f = [-5;5];
+            F =[0,1,0,0;0,-1,0,0];
+            f = [0.0873;0.0873];
             
             %input constraints
-            M = [1;1];
-            m = [-15;15];
+            M = [1;-1];
+            m = [0.26;0.26];
             
             
             % Compute LQR controller for unconstrained system
@@ -67,7 +67,10 @@ classdef MPC_Control_x < MPC_Control
             obj = 0;
             con = [];
             
-            for i = 1:N-1
+            con = (X(:,2) == mpc.A*X(:,1) + mpc.B*U(:,1)) + (M*U(:,1) <= m);
+            obj = U(:,1)'*R*U(:,1);
+            
+            for i = 2:N-1
                 con = [con, X(:,i+1) == mpc.A*X(:,i) + mpc.B*U(:,i)]; % System dynamics
                 con = [con, F*X(:,i) <= f]; % State constraints
                 con = [con, M*U(:,i) <= m]; % Input constraints

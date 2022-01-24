@@ -21,5 +21,13 @@ sys_d_roll = c2d(sys_roll, Ts);
 % % Design MPC controller
 H = 10; % Horizon length in seconds
 mpc_x = MPC_Control_x(sys_x, Ts, H);
-% % Get control input
-% ux = mpc_x.get_u(x)
+
+Tf = 20.0; % Time to simulate for
+x0 = [0,0,0,5]'; % (w, phi, v, p) Initial state
+
+[T, X_sub, U_sub] = rocket.simulate(sys_x, x0, Tf, @mpc_x.get_u, 0);
+ph = rocket.plotvis_sub(T, X_sub, U_sub, sys_x, xs, us);
+
+
+% Get control input
+ux = mpc_x.get_u(x)
