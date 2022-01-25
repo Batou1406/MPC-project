@@ -12,11 +12,10 @@ sys = rocket.linearize(xs, us);
 % % Design MPC controller
 H = 5; % Horizon length in seconds
 mpc_x = MPC_Control_x(sys_x, Ts, H);
-%mpc_y = MPC_Control_y(sys_y, Ts, H);
-%mpc_z = MPC_Control_z(sys_z, Ts, H);
-%mpc_roll = MPC_Control_roll(sys_roll, Ts, H);
+mpc_y = MPC_Control_y(sys_y, Ts, H);
+mpc_z = MPC_Control_z(sys_z, Ts, H);
+mpc_roll = MPC_Control_roll(sys_roll, Ts, H);
 
-Tf = 20.0; % Time to simulate for
 
 % Merge four sub−system controllers into one full−system controller
 mpc = rocket.merge_lin_controllers(xs, us, mpc_x, mpc_y, mpc_z, mpc_roll);

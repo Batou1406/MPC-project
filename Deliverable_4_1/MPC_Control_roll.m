@@ -59,22 +59,29 @@ classdef MPC_Control_roll < MPC_Control
             %Qf = sys.LQRPenalty;
             Xf = polytope(Xf);
             [Ff,ff] = double(Xf);
-            
+
+            % Plot Terminal Invariant Set
+            figure('Name','Terminal Invariant Set for Roll');
+            grid on;
+            plot(Xf, 'r');
+            xlabel('roll velocity'); 
+            ylabel('roll');
+      
             obj = 0;
             con = [];
             
-            con = (X(:,2) == mpc.A*X(:,1) + mpc.B*U(:,1)) + (M*U(:,1) <= m);
-            obj = U(:,1)'*R*U(:,1);
+            con = ((X(:,2)-x_ref) == mpc.A*(X(:,1)-x_ref) + mpc.B*(U(:,1)-u_ref)) + (M*U(:,1) <= m);
+            obj = (U(:,1)-u_ref)'*R*(U(:,1)-u_ref);
             
             for i = 2:N-1
-                con = [con, X(:,i+1) == mpc.A*X(:,i) + mpc.B*U(:,i)]; % System dynamics
+                con = [con, (X(:,i+1)-x_ref) == mpc.A*(X(:,i)-x_ref) + mpc.B*(U(:,i)-u_ref)]; % System dynamics
                 %con = [con, F*X(:,i) <= f]; % State constraints
-                con = [con, M*U(:,i) <= m]; % Input constraints
-                obj = obj + X(:,i)'*Q*X(:,i) + U(:,i)'*R*U(:,i); % Cost function
+                con = [con, M*(U(:,i)-u_ref) <= m]; % Input constraints
+                obj = obj + (X(:,i)-x_ref)'*Q*(X(:,i)-x_ref) + (U(:,i)-u_ref)'*R*(U(:,i)-u_ref); % Cost function
             end
             
-            con = [con, Ff*X(:,N) <= ff]; % Terminal constraint
-            obj = obj + X(:,N)'*Qf*X(:,N); % Terminal weight
+            %con = [con, Ff*X(:,N) <= ff]; % Terminal constraint
+            obj = obj + (X(:,N)-x_ref)'*Qf*(X(:,N)-x_ref); % Terminal weight
             
             
             % YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE
@@ -107,8 +114,9 @@ classdef MPC_Control_roll < MPC_Control
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             % YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE
             % You can use the matrices mpc.A, mpc.B, mpc.C and mpc.D
-            obj = 0;
-            con = [xs == 0, us == 0];
+            
+            con = [(xs == mpc.A*xs + mpc.B*us), (ref == mpc.C*xs)];
+            obj = [us*us];
             
             % YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -34,14 +34,14 @@ classdef MPC_Control_x < MPC_Control
             % SET THE PROBLEM CONSTRAINTS con AND THE OBJECTIVE obj HERE
             %objectives weight
             Q = eye(nx);
-            R = 100*eye(nu);
+            R = eye(nu);
             
             %state constraints
-            F =[0,1,0,0;0,-1,0,0];
+            F =[0,1,0,0;0,-1,0,0]; % |beta| <= 5° 
             f = [0.0873;0.0873];
             
             %input constraints
-            M = [1;-1];
+            M = [1;-1]; % |d1| <= 15°
             m = [0.26;0.26];
             
             
@@ -63,38 +63,23 @@ classdef MPC_Control_x < MPC_Control
                 end
             end
             [Ff,ff] = double(Xf);
-            Xf.projection(1:2).plot();
-
-            % Plot Terminal Invariant Set
-%             figure
-%             hold on; grid on;
-%             subplot(1,3,1)
-%             plot(Xf.projection(1:2), 'g');
-%             title('Dimension 1'); xlabel('vel pitch'); ylabel('pitch');
-%             subplot(1,3,2)
-%             plot(Xf.projection(2:3), 'b');
-%             title('Dimension 2'); xlabel('pitch'); ylabel('vel x');
-%             subplot(1,3,3)
-%             plot(Xf.projection(3:4), 'r');
-%             title('Dimension 3'); xlabel('vel x'); ylabel('x');
-%             sgtitle('Terminal Invariant Set for X');
             
             obj = 0;
             con = [];
-            
-            con = (X(:,2) == mpc.A*X(:,1) + mpc.B*U(:,1)) + (M*U(:,1) <= m);
-            obj = U(:,1)'*R*U(:,1);
+
+            con = ((X(:,2)-x_ref) == mpc.A*(X(:,1)-x_ref) + mpc.B*(U(:,1)-u_ref)) + (M*U(:,1) <= m);
+            obj = (U(:,1)-u_ref)'*R*(U(:,1)-u_ref);
             
             for i = 2:N-1
-                con = [con, X(:,i+1) == mpc.A*X(:,i) + mpc.B*U(:,i)]; % System dynamics
+                con = [con, (X(:,i+1)- x_ref) == mpc.A*(X(:,i)- x_ref)+ mpc.B*(U(:,i) - u_ref)]; % System dynamics
                 con = [con, F*X(:,i) <= f]; % State constraints
                 con = [con, M*U(:,i) <= m]; % Input constraints
-                obj = obj + X(:,i)'*Q*X(:,i) + U(:,i)'*R*U(:,i); % Cost function
+                obj = obj + (X(:,i) - x_ref)'*Q*(X(:,i) - x_ref) + (U(:,i) - u_ref)'*R*(U(:,i) - u_ref); % Cost function
             end
             
-            con = [con, Ff*X(:,N) <= ff]; % Terminal constraint
-            obj = obj + X(:,N)'*Qf*X(:,N); % Terminal weight
-       
+            %con = [con, Ff*X(:,N) <= ff]; % Terminal constraint
+            obj = obj + (X(:,N)-x_ref)'*Qf*(X(:,N)-x_ref); % Terminal weight
+            
             % YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             
@@ -125,13 +110,22 @@ classdef MPC_Control_x < MPC_Control
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             % YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE
+
+            %input constraints
+            M = [1;-1];
+            m = [0.26;0.26];
+
             % You can use the matrices mpc.A, mpc.B, mpc.C and mpc.D
-            obj = 0;
-            con = [xs == 0, us == 0];
+            %obj = 0;
+            %con = [xs == 0, us == 0];
+            
+            con = [(xs == mpc.A*xs + mpc.B*us), (M*us <= m), (ref == mpc.C*xs)];
+            obj = [us*us];
             
             % YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            
+
+
             % Compute the steady-state target
             target_opti = optimizer(con, obj, sdpsettings('solver', 'gurobi'), ref, {xs, us});
         end
