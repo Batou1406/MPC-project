@@ -75,25 +75,18 @@ classdef MPC_Control_z < MPC_Control
             Xf = polytope(Xf);
             [Ff,ff] = double(Xf);
 
-            % Plot Terminal Invariant Set
-
-            figure('Name','Terminal Invariant Set for Z');
-            grid on;
-            plot(Xf, 'r');
-            xlabel('velocity z'); 
-            ylabel('z');
-            
             obj = 0;
             con = [];
             
-            con = (X(:,2) == mpc.A*X(:,1) + mpc.B*U(:,1)) + (M*U(:,1) <= m);
-            obj = U(:,1)'*R*U(:,1);
+            con = ((X(:,2)-x_ref) == mpc.A*(X(:,1)-x_ref) + mpc.B*(U(:,1)-u_ref)) + (M*U(:,1) <= m);
+            obj = (U(:,1)-u_ref)'*R*(U(:,1)-u_ref);
             
             for i = 2:N-1
-                con = [con, X(:,i+1) == mpc.A*X(:,i) + mpc.B*U(:,i)]; % System dynamics
+                con = [con, (X(:,i+1)- x_ref) == mpc.A*(X(:,i)- x_ref)+ mpc.B*(U(:,i) - u_ref)]; % System dynamics
                 %con = [con, F*X(:,i) <= f]; % State constraints
                 con = [con, M*U(:,i) <= m]; % Input constraints
-                obj = obj + X(:,i)'*Q*X(:,i) + U(:,i)'*R*U(:,i); % Cost function
+                obj = obj + (X(:,i) - x_ref)'*Q*(X(:,i) - x_ref) + (U(:,i) - u_ref)'*R*(U(:,i) - u_ref); % Cost function
+
             end
             
             con = [con, Ff*X(:,N) <= ff]; % Terminal constraint
@@ -128,6 +121,10 @@ classdef MPC_Control_z < MPC_Control
             
             % Reference position (Ignore this before Todo 3.3)
             ref = sdpvar;
+
+            %input constraints
+            M = [1;-1];
+            m = [80-us;-50+us];
             
             % Disturbance estimate (Ignore this before Part 5)
             d_est = sdpvar;
@@ -140,6 +137,9 @@ classdef MPC_Control_z < MPC_Control
             
             % YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+            con = (xs == mpc.A*xs + mpc.B*us) + (M*us <= m) + (ref == mpc.C*xs);
+            obj = us*us;
             
             % Compute the steady-state target
             target_opti = optimizer(con, obj, sdpsettings('solver', 'gurobi'), {ref, d_est}, {xs, us});

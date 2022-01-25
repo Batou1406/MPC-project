@@ -34,7 +34,7 @@ classdef MPC_Control_x < MPC_Control
             % SET THE PROBLEM CONSTRAINTS con AND THE OBJECTIVE obj HERE
             %objectives weight
             Q = eye(nx);
-            R = 100*eye(nu);
+            R = eye(nu);
             
             %state constraints
             F =[0,1,0,0;0,-1,0,0];
@@ -63,6 +63,30 @@ classdef MPC_Control_x < MPC_Control
                 end
             end
             [Ff,ff] = double(Xf);
+
+            % Plot Terminal Invariant Set
+            figure
+            hold on; grid on;
+            subplot(1,3,1)
+            plot(Xf.projection(1:2), 'g');
+            title('Dimension 1'); 
+            xlabel('pitch velocity'); 
+            ylabel('pitch');
+
+            subplot(1,3,2)
+            grid on;
+            plot(Xf.projection(2:3), 'b');
+            title('Dimension 2'); 
+            xlabel('pitch'); 
+            ylabel('velocity x');
+
+            subplot(1,3,3)
+            grid on;
+            plot(Xf.projection(3:4), 'r');
+            title('Dimension 3'); 
+            xlabel('velocity x'); 
+            ylabel('x');
+            sgtitle('Terminal Invariant Set for X');
             
             obj = 0;
             con = [];

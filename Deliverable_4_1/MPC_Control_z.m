@@ -74,14 +74,6 @@ classdef MPC_Control_z < MPC_Control
             %Qf = sys.LQRPenalty;
             Xf = polytope(Xf);
             [Ff,ff] = double(Xf);
-
-            % Plot Terminal Invariant Set
-
-            figure('Name','Terminal Invariant Set for Z');
-            grid on;
-            plot(Xf, 'r');
-            xlabel('velocity z'); 
-            ylabel('z');
             
             obj = 0;
             con = [];
