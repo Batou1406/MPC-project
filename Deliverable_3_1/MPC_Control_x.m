@@ -37,11 +37,11 @@ classdef MPC_Control_x < MPC_Control
             R = eye(nu);
             
             %state constraints
-            F =[0,1,0,0;0,-1,0,0];
+            F =[0,1,0,0;0,-1,0,0]; % |beta| <= 5° 
             f = [0.0873;0.0873];
             
             %input constraints
-            M = [1;-1];
+            M = [1;-1]; % |d1| <= 15°
             m = [0.26;0.26];
             
             

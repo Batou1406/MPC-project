@@ -77,8 +77,8 @@ classdef MPC_Control_y < MPC_Control
                 obj = obj + (X(:,i) - x_ref)'*Q*(X(:,i) - x_ref) + (U(:,i) - u_ref)'*R*(U(:,i) - u_ref); % Cost function
             end
             
-            con = [con, Ff*X(:,N) <= ff]; % Terminal constraint
-            obj = obj + X(:,N)'*Qf*X(:,N); % Terminal weight
+            %con = [con, Ff*X(:,N) <= ff]; % Terminal constraint
+            obj = obj + (X(:,N)-x_ref)'*Qf*(X(:,N)-x_ref); % Terminal weight
             
             % YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -107,21 +107,20 @@ classdef MPC_Control_y < MPC_Control
             
             % Reference position (Ignore this before Todo 3.2)
             ref = sdpvar;
-
-            %input constraints
-            M = [1;-1];
-            m = [0.26;0.26];
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             % YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE
             % You can use the matrices mpc.A, mpc.B, mpc.C and mpc.D
-            obj = 0;
-            con = [xs == 0, us == 0];
+
+            %input constraints
+            M = [1;-1];
+            m = [0.26;0.26];      
+            
+            con = (xs == mpc.A*xs + mpc.B*us) + (M*us <= m) + (ref == mpc.C*xs);
+            obj = us*us;
             
             % YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            con = (xs == mpc.A*xs + mpc.B*us) + (M*us <= m) + (ref == mpc.C*xs);
-            obj = us*us;
             
             % Compute the steady-state target
             target_opti = optimizer(con, obj, sdpsettings('solver', 'gurobi'), ref, {xs, us});

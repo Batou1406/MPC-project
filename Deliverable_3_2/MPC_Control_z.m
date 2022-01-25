@@ -55,9 +55,11 @@ classdef MPC_Control_z < MPC_Control
             f = [];
             
             %input constraints
-            us = 56.6667;
+            u_lin = 56.6667;
+            %u_lin = 0;
+            
             M = [1;-1];
-            m = [80-us;-50+us];
+            m = [80-u_lin;-50+u_lin];
             
             % Compute LQR controller for unconstrained system
             [K,Qf,~] = dlqr(mpc.A,mpc.B,Q,R);
@@ -68,7 +70,7 @@ classdef MPC_Control_z < MPC_Control
             % MPT version
             sys = LTISystem('A',mpc.A,'B',mpc.B);
             sys.x.min = [-inf; -inf]; sys.x.max = [inf; inf];
-            sys.u.min = [50-us]; sys.u.max = [80-us];
+            sys.u.min = [50-u_lin]; sys.u.max = [80-u_lin];
             sys.x.penalty = QuadFunction(Q); sys.u.penalty = QuadFunction(R);
             Xf = sys.LQRSet;
             %Qf = sys.LQRPenalty;
@@ -86,11 +88,10 @@ classdef MPC_Control_z < MPC_Control
                 %con = [con, F*X(:,i) <= f]; % State constraints
                 con = [con, M*U(:,i) <= m]; % Input constraints
                 obj = obj + (X(:,i) - x_ref)'*Q*(X(:,i) - x_ref) + (U(:,i) - u_ref)'*R*(U(:,i) - u_ref); % Cost function
-
             end
             
-            con = [con, Ff*X(:,N) <= ff]; % Terminal constraint
-            obj = obj + X(:,N)'*Qf*X(:,N); % Terminal weight
+            %con = [con, Ff*X(:,N) <= ff]; % Terminal constraint
+            obj = obj + (X(:,N)-x_ref)'*Qf*(X(:,N)-x_ref); % Terminal weight
             
             % YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -121,10 +122,6 @@ classdef MPC_Control_z < MPC_Control
             
             % Reference position (Ignore this before Todo 3.3)
             ref = sdpvar;
-
-            %input constraints
-            M = [1;-1];
-            m = [80-us;-50+us];
             
             % Disturbance estimate (Ignore this before Part 5)
             d_est = sdpvar;
@@ -132,14 +129,17 @@ classdef MPC_Control_z < MPC_Control
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             % YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE
             % You can use the matrices mpc.A, mpc.B, mpc.C and mpc.D
-            obj = 0;
-            con = [xs == 0, us == 0];
             
-            % YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE
-            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            %input constraints
+            u_lin = 56.6667;
+            M = [1;-1];
+            m = [80-u_lin;-50+u_lin];
 
             con = (xs == mpc.A*xs + mpc.B*us) + (M*us <= m) + (ref == mpc.C*xs);
             obj = us*us;
+            
+            % YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             
             % Compute the steady-state target
             target_opti = optimizer(con, obj, sdpsettings('solver', 'gurobi'), {ref, d_est}, {xs, us});
