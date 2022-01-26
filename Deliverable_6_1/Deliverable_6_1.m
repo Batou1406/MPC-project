@@ -8,7 +8,7 @@ addpath(fullfile('..', 'src'));
 x0 = zeros(12,1); % inital state
 Ts = 1/10; % Note that we choose a larger Ts here to speed up the simulation
 rocket = Rocket(Ts);
-H = 5;
+H = 3;
 nmpc = NMPC_Control(rocket, H);
 
 % MPC reference with default maximum roll = 15 deg
