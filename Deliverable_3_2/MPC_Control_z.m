@@ -56,26 +56,25 @@ classdef MPC_Control_z < MPC_Control
             
             %input constraints
             u_lin = 56.6667;
-            %u_lin = 0;
-            
             M = [1;-1];
-            m = [80-u_lin;-50+u_lin];
+            m = [80-u_lin;-50+u_lin]; % 50% < Pavg < 80%
             
             % Compute LQR controller for unconstrained system
             [K,Qf,~] = dlqr(mpc.A,mpc.B,Q,R);
             % MATLAB defines K as -K, so invert its signal
             K = -K;
             
-            % Compute maximal invariant set
-            % MPT version
-            sys = LTISystem('A',mpc.A,'B',mpc.B);
-            sys.x.min = [-inf; -inf]; sys.x.max = [inf; inf];
-            sys.u.min = [50-u_lin]; sys.u.max = [80-u_lin];
-            sys.x.penalty = QuadFunction(Q); sys.u.penalty = QuadFunction(R);
-            Xf = sys.LQRSet;
-            %Qf = sys.LQRPenalty;
-            Xf = polytope(Xf);
-            [Ff,ff] = double(Xf);
+            %maximal invariant set is not require for 3.2
+%             % Compute maximal invariant set
+%             % MPT version
+%             sys = LTISystem('A',mpc.A,'B',mpc.B);
+%             sys.x.min = [-inf; -inf]; sys.x.max = [inf; inf];
+%             sys.u.min = [50-u_lin]; sys.u.max = [80-u_lin];
+%             sys.x.penalty = QuadFunction(Q); sys.u.penalty = QuadFunction(R);
+%             Xf = sys.LQRSet;
+%             %Qf = sys.LQRPenalty;
+%             Xf = polytope(Xf);
+%             [Ff,ff] = double(Xf);
 
             obj = 0;
             con = [];
@@ -133,7 +132,7 @@ classdef MPC_Control_z < MPC_Control
             %input constraints
             u_lin = 56.6667;
             M = [1;-1];
-            m = [80-u_lin;-50+u_lin];
+            m = [80-u_lin;-50+u_lin]; % 50% < Pavg < 80%
 
             con = (xs == mpc.A*xs + mpc.B*us) + (M*us <= m) + (ref == mpc.C*xs);
             obj = us*us;

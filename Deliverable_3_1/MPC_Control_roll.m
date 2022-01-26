@@ -42,7 +42,7 @@ classdef MPC_Control_roll < MPC_Control
             
             %input constraints
             M = [1;-1];
-            m = [20;20];
+            m = [20;20]; % -20% < Pdiff < 20%
             
             % Compute LQR controller for unconstrained system
             [K,Qf,~] = dlqr(mpc.A,mpc.B,Q,R);

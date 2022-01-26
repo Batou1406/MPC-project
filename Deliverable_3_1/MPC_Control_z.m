@@ -54,10 +54,10 @@ classdef MPC_Control_z < MPC_Control
             F =[];
             f = [];
             
-            %input constraints
-            us = 56.6667;
+            %input constraints 
+            u_lin = 56.6667;
             M = [1;-1];
-            m = [80-us;-50+us];
+            m = [80-u_lin;-50+u_lin]; % 50% < Pavg < 80%
             
             % Compute LQR controller for unconstrained system
             [K,Qf,~] = dlqr(mpc.A,mpc.B,Q,R);
@@ -68,7 +68,7 @@ classdef MPC_Control_z < MPC_Control
             % MPT version
             sys = LTISystem('A',mpc.A,'B',mpc.B);
             sys.x.min = [-inf; -inf]; sys.x.max = [inf; inf];
-            sys.u.min = [50-us]; sys.u.max = [80-us];
+            sys.u.min = [50-u_lin]; sys.u.max = [80-u_lin];
             sys.x.penalty = QuadFunction(Q); sys.u.penalty = QuadFunction(R);
             Xf = sys.LQRSet;
             %Qf = sys.LQRPenalty;

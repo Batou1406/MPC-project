@@ -34,14 +34,14 @@ classdef MPC_Control_y < MPC_Control
             % SET THE PROBLEM CONSTRAINTS con AND THE OBJECTIVE obj HERE
             %objectives weight
             Q = eye(nx);
-            R = 2*eye(nu);
+            R = 100*eye(nu);
             
             %state constraints
-            F =[0,1,0,0;0,-1,0,0];
+            F =[0,1,0,0;0,-1,0,0]; % |alpha| <= 5° 
             f = [0.0873;0.0873];
             
             %input constraints
-            M = [1;-1];
+            M = [1;-1];  % |d1| <= 15°
             m = [0.26;0.26];
             
             
@@ -50,19 +50,20 @@ classdef MPC_Control_y < MPC_Control
             % MATLAB defines K as -K, so invert its signal
             K = -K;
             
-            % Compute maximal invariant set
-            Xf = polytope([F;M*K],[f;m]);
-            Acl = [mpc.A+mpc.B*K];
-            while 1
-                prevXf = Xf;
-                [T,t] = double(Xf);
-                preXf = polytope(T*Acl,t);
-                Xf = intersect(Xf, preXf);
-                if isequal(prevXf, Xf)
-                    break
-                end
-            end
-            [Ff,ff] = double(Xf);
+            %maximal invariant set is not require for 3.2
+%             % Compute maximal invariant set
+%             Xf = polytope([F;M*K],[f;m]);
+%             Acl = [mpc.A+mpc.B*K];
+%             while 1
+%                 prevXf = Xf;
+%                 [T,t] = double(Xf);
+%                 preXf = polytope(T*Acl,t);
+%                 Xf = intersect(Xf, preXf);
+%                 if isequal(prevXf, Xf)
+%                     break
+%                 end
+%             end
+%             [Ff,ff] = double(Xf);
             
             obj = 0;
             con = [];
@@ -113,7 +114,7 @@ classdef MPC_Control_y < MPC_Control
             % You can use the matrices mpc.A, mpc.B, mpc.C and mpc.D
 
             %input constraints
-            M = [1;-1];
+            M = [1;-1]; % |d2| <= 15°
             m = [0.26;0.26];      
             
             con = (xs == mpc.A*xs + mpc.B*us) + (M*us <= m) + (ref == mpc.C*xs);
