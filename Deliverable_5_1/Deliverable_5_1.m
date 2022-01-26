@@ -1,4 +1,4 @@
-clear all
+%clear all
 close all
 clc
 
@@ -24,8 +24,12 @@ mpc_y = MPC_Control_y(sys_y, Ts, H);
 mpc_z = MPC_Control_z(sys_z, Ts, H);
 mpc_roll = MPC_Control_roll(sys_roll, Ts, H);
 
+
+% Setup reference function
+%ref = @(t_, x_) rocket.MPC_ref(t_, Tf);
+
 %simulate
 rocket.mass = 1.783; % Manipulate mass for simulation
-%[T, X, U, Ref] = rocket.simulate_f(x0, Tf, mpc, ref);
-[T, X, U, Ref, Z_hat] = rocket.simulate_f_est_z(x0, Tf, mpc, ref, mpc_z, sys_z);
+[T, X, U, Ref] = rocket.simulate_f(x0, Tf, mpc, ref);
+%[T, X, U, Ref, Z_hat] = rocket.simulate_f_est_z(x0, Tf, mpc, ref, mpc_z, sys_z);
 ph = rocket.plotvis(T, X, U, Ref);

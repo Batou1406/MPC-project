@@ -117,7 +117,7 @@ classdef MPC_Control_x < MPC_Control
             M = [1;-1];
             m = [0.26;0.26]; % |d1| <= 15°
             
-            con = xs == mpc.A*xs + mpc.B*us) + (M*us <= m) + (ref == mpc.C*xs);
+            con = (xs == mpc.A*xs + mpc.B*us) + (M*us <= m) + (ref == mpc.C*xs);
             obj = us*us;
             
             % YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE

@@ -60,13 +60,6 @@ classdef MPC_Control_roll < MPC_Control
 %             %Qf = sys.LQRPenalty;
 %             Xf = polytope(Xf);
 %             [Ff,ff] = double(Xf);
-
-            % Plot Terminal Invariant Set
-            figure('Name','Terminal Invariant Set for Roll');
-            grid on;
-            plot(Xf, 'r');
-            xlabel('roll velocity'); 
-            ylabel('roll');
       
             obj = 0;
             con = [];
