@@ -34,7 +34,7 @@ classdef MPC_Control_x < MPC_Control
             % SET THE PROBLEM CONSTRAINTS con AND THE OBJECTIVE obj HERE
             %objectives weight
             Q = eye(nx);
-            R = eye(nu);
+            R = 10*eye(nu);
             
             %state constraints
             F =[0,1,0,0;0,-1,0,0]; % |beta| <= 5° 
@@ -50,19 +50,20 @@ classdef MPC_Control_x < MPC_Control
             % MATLAB defines K as -K, so invert its signal
             K = -K;
             
-            % Compute maximal invariant set
-            Xf = polytope([F;M*K],[f;m]);
-            Acl = [mpc.A+mpc.B*K];
-            while 1
-                prevXf = Xf;
-                [T,t] = double(Xf);
-                preXf = polytope(T*Acl,t);
-                Xf = intersect(Xf, preXf);
-                if isequal(prevXf, Xf)
-                    break
-                end
-            end
-            [Ff,ff] = double(Xf);
+            % invariant set is not required for 3.2 and the following
+%             % Compute maximal invariant set
+%             Xf = polytope([F;M*K],[f;m]);
+%             Acl = [mpc.A+mpc.B*K];
+%             while 1
+%                 prevXf = Xf;
+%                 [T,t] = double(Xf);
+%                 preXf = polytope(T*Acl,t);
+%                 Xf = intersect(Xf, preXf);
+%                 if isequal(prevXf, Xf)
+%                     break
+%                 end
+%             end
+%             [Ff,ff] = double(Xf);
             
             obj = 0;
             con = [];
@@ -110,21 +111,17 @@ classdef MPC_Control_x < MPC_Control
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             % YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE
-
+            % You can use the matrices mpc.A, mpc.B, mpc.C and mpc.D
+            
             %input constraints
             M = [1;-1];
-            m = [0.26;0.26];
-
-            % You can use the matrices mpc.A, mpc.B, mpc.C and mpc.D
-            %obj = 0;
-            %con = [xs == 0, us == 0];
+            m = [0.26;0.26]; % |d1| <= 15°
             
-            con = [(xs == mpc.A*xs + mpc.B*us), (M*us <= m), (ref == mpc.C*xs)];
-            obj = [us*us];
+            con = xs == mpc.A*xs + mpc.B*us) + (M*us <= m) + (ref == mpc.C*xs);
+            obj = us*us;
             
             % YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 
             % Compute the steady-state target
             target_opti = optimizer(con, obj, sdpsettings('solver', 'gurobi'), ref, {xs, us});

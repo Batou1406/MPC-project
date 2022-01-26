@@ -1,5 +1,10 @@
+clear all
+close all
+clc
+
 addpath(fullfile('..', 'src'));
 
+%%
 Ts = 1/20; % Sample time
 rocket = Rocket(Ts);
 
@@ -27,6 +32,6 @@ ref = @(t_, x_) rocket.MPC_ref(t_, Tf);
 x0 = zeros(12,1);
 [T, X, U, Ref] = rocket.simulate_f(x0, Tf, mpc, ref);
 % Plot pose
-rocket.anim_rate = 1; % Increase this to make the animation faster
+rocket.anim_rate = 10; % Increase this to make the animation faster
 ph = rocket.plotvis(T, X, U, Ref);
 ph.fig.Name = 'Merged lin. MPC in nonlinear simulation'; % Set a figure title

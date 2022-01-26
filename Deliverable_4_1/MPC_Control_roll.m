@@ -33,7 +33,7 @@ classdef MPC_Control_roll < MPC_Control
             
             % SET THE PROBLEM CONSTRAINTS con AND THE OBJECTIVE obj HERE
              %objectives weight
-            Q = 10*eye(nx);
+            Q = 100*eye(nx);
             R = eye(nu);
             
             %state constraints
@@ -42,23 +42,24 @@ classdef MPC_Control_roll < MPC_Control
             
             %input constraints
             M = [1;-1];
-            m = [20;20];
+            m = [20;20];  % -20% < Pdiff < 20%
             
             % Compute LQR controller for unconstrained system
             [K,Qf,~] = dlqr(mpc.A,mpc.B,Q,R);
             % MATLAB defines K as -K, so invert its signal
             K = -K;
             
-            % Compute maximal invariant set
-            % MPT version
-            sys = LTISystem('A',mpc.A,'B',mpc.B);
-            sys.x.min = [-inf; -inf]; sys.x.max = [inf; inf];
-            sys.u.min = [-20]; sys.u.max = [20];
-            sys.x.penalty = QuadFunction(Q); sys.u.penalty = QuadFunction(R);
-            Xf = sys.LQRSet;
-            %Qf = sys.LQRPenalty;
-            Xf = polytope(Xf);
-            [Ff,ff] = double(Xf);
+            % invariant set is not required for 3.2 and the following
+%             % Compute maximal invariant set
+%             % MPT version
+%             sys = LTISystem('A',mpc.A,'B',mpc.B);
+%             sys.x.min = [-inf; -inf]; sys.x.max = [inf; inf];
+%             sys.u.min = [-20]; sys.u.max = [20];
+%             sys.x.penalty = QuadFunction(Q); sys.u.penalty = QuadFunction(R);
+%             Xf = sys.LQRSet;
+%             %Qf = sys.LQRPenalty;
+%             Xf = polytope(Xf);
+%             [Ff,ff] = double(Xf);
 
             % Plot Terminal Invariant Set
             figure('Name','Terminal Invariant Set for Roll');
@@ -115,8 +116,12 @@ classdef MPC_Control_roll < MPC_Control
             % YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE
             % You can use the matrices mpc.A, mpc.B, mpc.C and mpc.D
             
-            con = [(xs == mpc.A*xs + mpc.B*us), (ref == mpc.C*xs)];
-            obj = [us*us];
+            %input constraints
+            M = [1;-1];
+            m = [20;20]; % -20% < Pdiff < 20%
+            
+            con = (xs == mpc.A*xs + mpc.B*us) + (M*us <= m) + (ref == mpc.C*xs);
+            obj = us*us;
             
             % YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
