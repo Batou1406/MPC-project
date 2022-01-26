@@ -55,27 +55,26 @@ classdef MPC_Control_z < MPC_Control
             f = [];
             
             %input constraints
-            u_lin = 56.6667;
-            %u_lin = 0;
-            
+            u_lin = 56.6667;            
             M = [1;-1];
-            m = [80-u_lin;-50+u_lin];
+            m = [80-u_lin;-50+u_lin]; % 50% < Pavg < 80%
             
             % Compute LQR controller for unconstrained system
             [K,Qf,~] = dlqr(mpc.A,mpc.B,Q,R);
             % MATLAB defines K as -K, so invert its signal
             K = -K;
             
-            % Compute maximal invariant set
-            % MPT version
-            sys = LTISystem('A',mpc.A,'B',mpc.B);
-            sys.x.min = [-inf; -inf]; sys.x.max = [inf; inf];
-            sys.u.min = [50-u_lin]; sys.u.max = [80-u_lin];
-            sys.x.penalty = QuadFunction(Q); sys.u.penalty = QuadFunction(R);
-            Xf = sys.LQRSet;
-            %Qf = sys.LQRPenalty;
-            Xf = polytope(Xf);
-            [Ff,ff] = double(Xf);
+            %terminal set is not required
+%             % Compute maximal invariant set
+%             % MPT version
+%             sys = LTISystem('A',mpc.A,'B',mpc.B);
+%             sys.x.min = [-inf; -inf]; sys.x.max = [inf; inf];
+%             sys.u.min = [50-u_lin]; sys.u.max = [80-u_lin];
+%             sys.x.penalty = QuadFunction(Q); sys.u.penalty = QuadFunction(R);
+%             Xf = sys.LQRSet;
+%             %Qf = sys.LQRPenalty;
+%             Xf = polytope(Xf);
+%             [Ff,ff] = double(Xf);
 
             obj = 0;
             con = [];
@@ -133,7 +132,7 @@ classdef MPC_Control_z < MPC_Control
             %input constraints
             u_lin = 56.6667;
             M = [1;-1];
-            m = [80-u_lin;-50+u_lin];
+            m = [80-u_lin;-50+u_lin]; % 50% < Pavg < 80%
 
             con = (xs == mpc.A*xs + mpc.B*us) + (M*us <= m) + (ref == mpc.C*xs);
             obj = us*us;
@@ -157,6 +156,7 @@ classdef MPC_Control_z < MPC_Control
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             % YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE
             % You can use the matrices mpc.A, mpc.B, mpc.C and mpc.D
+            
             [nx, nu] = size(mpc.B);
             A_bar = [mpc.A,mpc.B; zeros(1,nx),1];
             B_bar = [mpc.B; zeros(1,nu)];
