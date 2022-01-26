@@ -17,8 +17,48 @@ ref_sym = opti.parameter(4, 1);   % target position
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE
+Q= 100*eye(nx);
+R= eye(nu);
+
+H = [0 0 0 0 0 0 0 0 0 1 0 0; 0 0 0 0 0 0 0 0 0 0 1 0; 0 0 0 0 0 0 0 0 0 0 0 1; 0 0 0 0 0 1 0 0 0 0 0 0]';
+
+%terminal weight
+[xs, us] = rocket.trim();
+sys = rocket.linearize(xs, us);
+sys_d = c2d(sys, rocket.Ts);
+% Compute LQR controller for unconstrained system
+[K,Qf,~] = dlqr(sys_d.A,sys_d.B,Q,R);
 
 
+big_Q = blkdiag(kron(eye(N-1),Q),Qf);
+big_R = kron(eye(N-1),R);
+
+
+%initial state
+opti.subject_to(X_sym(:,1) == x0_sym);
+
+opti.minimize((X_sym - kron(ones(1,N),H*ref_sym))'*big_Q*(X_sym(:,i) - kron(ones(1,N),H*ref_sym)) +  (U_sym(:,i))'*R*(U_sym(:,i)));
+
+for i = 1:N-1
+    % objective
+    opti.minimize((X_sym(:,i) - H*ref_sym)'*Q*(X_sym(:,i) - H*ref_sym) +  (U_sym(:,i))'*R*(U_sym(:,i)));
+    
+    % constraint
+    %state dynamics
+    opti.subject_to(X_sym(:,i+1) == f_discrete(X_sym(:,i), U_sym(:,i),rocket.Ts,rocket)); 
+    
+    %input constraints
+    opti.subject_to(-0.26 <= U_sym(1,i) <= 0.26);  % |d1| < 15°
+    opti.subject_to(-0.26 <= U_sym(2,i) <= 0.26);  % |d2| < 15°
+    opti.subject_to(50 <= U_sym(3,i) <= 80);  % 50% < Pavg < 80%
+    opti.subject_to(-20 <= U_sym(4,i) <=20);  % -20% < Pdiff < 20%
+    
+    %state constraints
+    opti.subject_to(-1.48 <= X_sym(5,i) <=1.48);  % -85° < beta < 85°
+
+end
+
+opti.minimize((X_sym(:,N) - H*ref_sym)'*Qf*(X_sym(:,N) - H*ref_sym)); % Terminal weight
 
 % YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
