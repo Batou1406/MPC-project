@@ -33,7 +33,7 @@ classdef MPC_Control_x < MPC_Control
             
             % SET THE PROBLEM CONSTRAINTS con AND THE OBJECTIVE obj HERE
             %objectives weight
-            Q = eye(nx);
+            Q = 10*eye(nx);
             R = eye(nu);
             
             %state constraints

@@ -47,7 +47,7 @@ classdef MPC_Control_z < MPC_Control
             
             % SET THE PROBLEM CONSTRAINTS con AND THE OBJECTIVE obj HERE
              %objectives weight
-            Q = 10*eye(nx);
+            Q = 100*eye(nx);
             R = eye(nu);
             
             %state constraints
@@ -79,11 +79,11 @@ classdef MPC_Control_z < MPC_Control
             obj = 0;
             con = [];
             
-            con = ((X(:,2)-x_ref) == mpc.A*(X(:,1)-x_ref) + mpc.B*(U(:,1)-u_ref)) + (M*U(:,1) <= m);
+            con = ((X(:,2)-x_ref) == mpc.A*(X(:,1)-x_ref) + mpc.B*(U(:,1)-u_ref)) + (M*U(:,1) <= m + mpc.B*d_est);
             obj = (U(:,1)-u_ref)'*R*(U(:,1)-u_ref);
             
             for i = 2:N-1
-                con = [con, (X(:,i+1)- x_ref) == mpc.A*(X(:,i)- x_ref)+ mpc.B*(U(:,i) - u_ref)]; % System dynamics
+                con = [con, (X(:,i+1)- x_ref) == mpc.A*(X(:,i)- x_ref)+ mpc.B*(U(:,i) - u_ref) + mpc.B*d_est]; % System dynamics
                 %con = [con, F*X(:,i) <= f]; % State constraints
                 con = [con, M*U(:,i) <= m]; % Input constraints
                 obj = obj + (X(:,i) - x_ref)'*Q*(X(:,i) - x_ref) + (U(:,i) - u_ref)'*R*(U(:,i) - u_ref); % Cost function
@@ -161,7 +161,7 @@ classdef MPC_Control_z < MPC_Control
             A_bar = [mpc.A,mpc.B; zeros(1,nx),1];
             B_bar = [mpc.B; zeros(1,nu)];
             C_bar = [mpc.C, 0]; %Cd = 0?
-            L = -place(A_bar',C_bar',[0.3,0.4,0.5])';
+            L = -place(A_bar',C_bar',[0.5,0.6,0.7])';
             
             % YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
