@@ -79,12 +79,14 @@ classdef MPC_Control_z < MPC_Control
             obj = 0;
             con = [];
             
-            %con = ((X(:,2)) == mpc.A*(X(:,1)) + mpc.B*(U(:,1)) + mpc.B*d_est) + (M*U(:,1) <= m); % equivalent formulation
+            %con = ((X(:,2)) == mpc.A*(X(:,1)) + mpc.B*(U(:,1)) +
+            %mpc.B*d_est) + (M*U(:,1) <= m); %
             con = ((X(:,2)-x_ref) == mpc.A*(X(:,1)-x_ref) + mpc.B*(U(:,1)-u_ref)) + (M*U(:,1) <= m);
             obj = (U(:,1)-u_ref)'*R*(U(:,1)-u_ref);
             
             for i = 2:N-1
-                %con = [con, (X(:,i+1)) == mpc.A*(X(:,i))+ mpc.B*(U(:,i)) + mpc.B*d_est]; % System dynamics equivalent formulation
+                %con = [con, (X(:,i+1)) == mpc.A*(X(:,i))+ mpc.B*(U(:,i)) + mpc.B*d_est]; % System dynamics
+
                 con = [con, (X(:,i+1)- x_ref) == mpc.A*(X(:,i)- x_ref)+ mpc.B*(U(:,i) - u_ref)]; % System dynamics
                 %con = [con, F*X(:,i) <= f]; % State constraints
                 con = [con, M*U(:,i) <= m]; % Input constraints
@@ -137,6 +139,7 @@ classdef MPC_Control_z < MPC_Control
             m = [80-u_lin;-50+u_lin]; % 50% < Pavg < 80%
 
             con = (xs == mpc.A*xs + mpc.B*us + mpc.B*d_est) + (M*us <= m) + (ref == mpc.C*xs);
+            %con = (xs == mpc.A*xs + mpc.B*us) + (M*us <= m) + (ref == mpc.C*xs);
             obj = us*us;
             
             % YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE
