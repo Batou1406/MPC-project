@@ -17,8 +17,8 @@ ref_sym = opti.parameter(4, 1);   % target position
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE
-Q= diag([10,10,1,1,1,100,1,1,1,100,100,80]) ; %wx,wy,wz,alpha,beta,gamma,vx,vy,vz,x,y,z
-R= diag([1,1,0.1,0.3]); %d1,d2,pavg,pdiff
+Q= diag([1,1,0.1,1,1,50,0.1,0.1,0.1,100,100,200]) ; %wx,wy,wz,alpha,beta,gamma,
+R= diag([1,1,0.1,0.3]);
 
 G = [0 0 0 0 0 0 0 0 0 1 0 0; 0 0 0 0 0 0 0 0 0 0 1 0; 0 0 0 0 0 0 0 0 0 0 0 1; 0 0 0 0 0 1 0 0 0 0 0 0]';
 
@@ -38,7 +38,7 @@ big_R = kron(eye(N-1),R);
 opti.subject_to(X_sym(:,1) == x0_sym);
 
 % objective
-opti.minimize((vec(X_sym - kron(ones(1,N),G*ref_sym)))'*big_Q*(vec(X_sym - kron(ones(1,N),G*ref_sym))) +  (vec(U_sym - kron(ones(1,N-1),us)))'*big_R*vec(U_sym - kron(ones(1,N-1),us)));
+opti.minimize((vec(X_sym - kron(ones(1,N),G*ref_sym)))'*big_Q*(vec(X_sym - kron(ones(1,N),G*ref_sym))) +  (vec(U_sym))'*big_R*vec(U_sym));
 
 for i = 1:N-1
     
