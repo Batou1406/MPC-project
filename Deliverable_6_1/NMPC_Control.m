@@ -20,7 +20,7 @@ ref_sym = opti.parameter(4, 1);   % target position
 Q= diag([1,1,0.1,1,1,50,0.1,0.1,0.1,100,100,200]) ;
 R= diag([1,1,0.1,0.3]);
 
-H = [0 0 0 0 0 0 0 0 0 1 0 0; 0 0 0 0 0 0 0 0 0 0 1 0; 0 0 0 0 0 0 0 0 0 0 0 1; 0 0 0 0 0 1 0 0 0 0 0 0]';
+G = [0 0 0 0 0 0 0 0 0 1 0 0; 0 0 0 0 0 0 0 0 0 0 1 0; 0 0 0 0 0 0 0 0 0 0 0 1; 0 0 0 0 0 1 0 0 0 0 0 0]';
 
 %terminal weight
 [xs, us] = rocket.trim();
@@ -38,11 +38,9 @@ big_R = kron(eye(N-1),R);
 opti.subject_to(X_sym(:,1) == x0_sym);
 
 % objective
-opti.minimize((vec(X_sym - kron(ones(1,N),H*ref_sym)))'*big_Q*(vec(X_sym - kron(ones(1,N),H*ref_sym))) +  (vec(U_sym))'*big_R*vec(U_sym));
+opti.minimize((vec(X_sym - kron(ones(1,N),G*ref_sym)))'*big_Q*(vec(X_sym - kron(ones(1,N),G*ref_sym))) +  (vec(U_sym))'*big_R*vec(U_sym));
 
 for i = 1:N-1
-    % objective
-    %opti.minimize((X_sym(:,i) - H*ref_sym)'*Q*(X_sym(:,i) - H*ref_sym) +  (U_sym(:,i))'*R*(U_sym(:,i)));
     
     % constraint
     %state dynamics
@@ -59,7 +57,6 @@ for i = 1:N-1
 
 end
 
-%opti.minimize((X_sym(:,N) - H*ref_sym)'*Qf*(X_sym(:,N) - H*ref_sym)); % Terminal weight
 
 % YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE YOUR CODE HERE
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
