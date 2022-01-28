@@ -47,8 +47,8 @@ classdef MPC_Control_z < MPC_Control
             
             % SET THE PROBLEM CONSTRAINTS con AND THE OBJECTIVE obj HERE
              %objectives weight
-            Q = 100*eye(nx);
-            R = eye(nu);
+            Q = diag([1,100]); %vz,z
+            R = diag([1]); %pavg
             
             %state constraints
             F =[];
