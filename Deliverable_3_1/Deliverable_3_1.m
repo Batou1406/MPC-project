@@ -16,11 +16,7 @@ sys = rocket.linearize(xs, us);
 [sys_x, sys_y, sys_z, sys_roll] = rocket.decompose(sys, xs, us);
 
 % % Design MPC controller
-<<<<<<< Updated upstream
 H = 4   ; % Horizon length in seconds
-=======
-H = 4; % Horizon length in seconds
->>>>>>> Stashed changes
 mpc_x = MPC_Control_x(sys_x, Ts, H);
 mpc_y = MPC_Control_y(sys_y, Ts, H);
 mpc_z = MPC_Control_z(sys_z, Ts, H);
