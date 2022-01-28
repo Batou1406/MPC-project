@@ -33,8 +33,8 @@ classdef MPC_Control_y < MPC_Control
             
             % SET THE PROBLEM CONSTRAINTS con AND THE OBJECTIVE obj HERE
             %objectives weight
-            Q = eye(nx);
-            R = 10*eye(nu);
+            Q = diag([10,1,1,10]); %wx,alpha,vy,y
+            R = diag([5]); %d1
             
             %state constraints
             F =[0,1,0,0;0,-1,0,0]; % |alpha| <= 5° 

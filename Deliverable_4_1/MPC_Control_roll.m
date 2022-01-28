@@ -33,8 +33,8 @@ classdef MPC_Control_roll < MPC_Control
             
             % SET THE PROBLEM CONSTRAINTS con AND THE OBJECTIVE obj HERE
              %objectives weight
-            Q = 100*eye(nx);
-            R = eye(nu);
+            Q = diag([1,80]); %wz, gamma
+            R = diag([1]); %Pdiff
             
             %state constraints
             F =[];
