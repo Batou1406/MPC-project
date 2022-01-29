@@ -36,6 +36,10 @@ classdef MPC_Control_roll < MPC_Control
             Q = diag([1,80]); %wz, gamma
             R = diag([1]); %Pdiff
             
+            %Q and R for part 6.1
+            %Q = diag([1,10]); %wz, gamma
+            %R = diag([1]); %Pdiff
+            
             %state constraints
             F =[];
             f = [];

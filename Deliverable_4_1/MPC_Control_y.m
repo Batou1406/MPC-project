@@ -36,6 +36,10 @@ classdef MPC_Control_y < MPC_Control
             Q = diag([10,1,1,10]); %wx,alpha,vy,y
             R = diag([5]); %d1
             
+            %Q and R for part 6.1
+            %Q = diag([100,100,1,30]); %wx,alpha,vy,y
+            %R = diag([1]); %d1
+            
             %state constraints
             F =[0,1,0,0;0,-1,0,0]; % |alpha| <= 5° 
             f = [0.0873;0.0873];

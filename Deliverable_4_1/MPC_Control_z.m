@@ -50,6 +50,10 @@ classdef MPC_Control_z < MPC_Control
             Q = diag([1,100]); %vz,z
             R = diag([1]); %pavg
             
+            % Q and R for part 6.1
+            %Q = diag([1,200]); %vz,z
+            %R = diag([1]); %pavg
+            
             %state constraints
             F =[];
             f = [];
