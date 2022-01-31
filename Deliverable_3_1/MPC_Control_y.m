@@ -32,7 +32,7 @@ classdef MPC_Control_y < MPC_Control
             %       the DISCRETE-TIME MODEL of your system
             
             % SET THE PROBLEM CONSTRAINTS con AND THE OBJECTIVE obj HERE
- %objectives weight
+            %objectives weight
             Q = eye(nx);
             R = 100*eye(nu);
             

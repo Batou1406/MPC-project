@@ -27,7 +27,7 @@ mpc = rocket.merge_lin_controllers(xs, us, mpc_x, mpc_y, mpc_z, mpc_roll);
 
 % Setup reference function
 Tf = 30;
-%ref = @(t_, x_) rocket.MPC_ref(t_, Tf);
+ref = @(t_, x_) rocket.MPC_ref(t_, Tf);
 
 %test with 50° roll anlge for part 6.1
 %roll_max = deg2rad(50);
